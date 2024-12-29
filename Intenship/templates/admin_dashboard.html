@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0; 
+        }
+        h1 { 
+            text-align: center; 
+            color: #3498db; 
+            margin: 20px; 
+        }
+        .container { display: flex; justify-content: space-around; margin-top: 30px; }
+        .user-section, .task-section { width: 45%; }
+        table { width: 100%; margin: 20px 0; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #3498db; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .button { padding: 10px 20px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .button:hover { background-color: #2980b9; }
+        .logout-button {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 20px;
+    display: block;
+    width: 200px; /* Adjust the width as needed */
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
+}
+
+        /* Flash Message Styles */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    font-size: 16px;
+    display: inline-block;
+    width: 100%;
+}
+
+ul li.success {
+    background-color: #28a745;
+    color: white;
+}
+
+ul li.danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+ul li.warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+ul li.info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding-left: 10px;
+}
+
+ul li a:hover {
+    text-decoration: underline;
+}
+
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    <div class="container">
+        <!-- User Section -->
+        <div class="user-section">
+            <h2>Manage Users</h2>
+            <form method="POST" action="{{ url_for('add_user') }}">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button class="button" type="submit">Add User</button>
+            </form>
+            <!-- Flash messages block -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td class="actions">
+                            <a href="{{ url_for('edit_user', user_id=user['_id']) }}">Edit</a> | 
+                            <a href="{{ url_for('delete_user', user_id=user['_id']) }}">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Task Section (without edit or delete links) -->
+        <div class="task-section">
+            <h2>Manage Tasks</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task Name</th>
+                        <th>Assigned User</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>{{ task.task_name }}</td>
+                        <td>{{ task.username }}</td>
+                        <td>{{ task.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <a href="{{ url_for('admin_logout') }}" class="logout-button">Logout</a>
+</body>
+</html>

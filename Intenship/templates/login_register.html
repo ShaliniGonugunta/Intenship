@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login or Register</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(45deg, #6a11cb, #2575fc); /* Gradient background */
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .form-container:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: #3498db;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+        }
+
+        .admin-btn {
+            background-color: #e74c3c;
+            margin-top: 15px;
+        }
+
+        .admin-btn:hover {
+            background-color: #c0392b;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border: 2px solid #3498db;
+            outline: none;
+        }
+
+        input[type="text"]::placeholder, input[type="password"]::placeholder {
+            color: #7f8c8d;
+        }
+
+        .register-fields {
+            display: none;
+        }
+
+        .toggle-btns {
+            margin-bottom: 20px;
+        }
+
+        .toggle-btns button {
+            width: 48%;
+            padding: 12px;
+            margin: 0 4%;
+            border-radius: 6px;
+            background-color: #2c3e50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .toggle-btns button:hover {
+            background-color: #34495e;
+            transform: translateY(-3px);
+        }
+        /* Flash Message Styles */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    font-size: 16px;
+    display: inline-block;
+    width: 100%;
+}
+
+ul li.success {
+    background-color: #28a745;
+    color: white;
+}
+
+ul li.danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+ul li.warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+ul li.info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding-left: 10px;
+}
+
+ul li a:hover {
+    text-decoration: underline;
+}
+
+
+    </style>
+</head>
+<body>
+
+
+<div class="form-container">
+    <h1>Login or Register</h1>
+    <!-- Flash messages block -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Toggle between Login and Register -->
+    <div class="toggle-btns">
+        <button type="button" onclick="toggleForm('login')" class="btn">Login</button>
+        <button type="button" onclick="toggleForm('register')" class="btn admin-btn">Register</button>
+    </div>
+
+    <!-- Login Form -->
+    <form method="POST" action="/" id="login-form">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="hidden" name="action" value="Login">
+        <button type="submit" class="btn">Login</button>
+    </form>
+
+    <!-- Register Form (initially hidden) -->
+    <form method="POST" action="/" id="register-form" class="register-fields">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+        <input type="hidden" name="action" value="Register">
+        <button type="submit" class="btn">Register</button>
+    </form>
+
+    <!-- Admin Login Button -->
+    <form action="/admin_login" method="GET">
+        <button type="submit" class="btn admin-btn">Admin Login</button>
+    </form>
+</div>
+
+<script>
+    // Function to toggle between Login and Register forms
+    function toggleForm(formType) {
+        if (formType === 'register') {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+        } else {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+        }
+    }
+
+    // Initialize the default form to be the login form
+    toggleForm('login');
+</script>
+
+</body>
+</html>

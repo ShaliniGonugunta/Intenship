@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+
+        .logout-btn {
+            display: block;
+            margin: 10px auto 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            width: 150px;
+        }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .task-input-form, .task-list {
+            margin: 20px auto;
+            max-width: 1000px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-input-form h2, .task-list h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .task-input-form form {
+            display: grid;
+            gap: 15px;
+        }
+
+        .task-input-form input, .task-input-form select, .task-input-form button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .task-input-form button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .task-input-form button:hover {
+            background-color: #2980b9;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        td {
+            text-align: center;
+        }
+
+        .task-actions a {
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+        }
+
+        .task-actions a:hover {
+            background-color: #2980b9;
+        }
+
+        .task-actions .delete-btn {
+            background-color: #e74c3c;
+        }
+        /* Flash Message Styles */
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 16px;
+            display: inline-block;
+            width: 100%;
+        }
+
+        ul li.success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        ul li.danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        ul li.warning {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        ul li.info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding-left: 10px;
+        }
+
+        ul li a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Welcome, {{ username }}!</h1>
+
+    <!-- Logout Button -->
+    <a href="/logout" class="logout-btn">Logout</a>
+
+    <div class="task-input-form">
+        <h2>Create Task</h2>
+        <!-- Flash messages block -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+
+        <form action="/tasks" method="POST">
+            <input type="text" name="task_name" placeholder="Task Name" required>
+            <textarea name="description" placeholder="Task Description" rows="3"></textarea>
+            <select name="priority" required>
+                <option value="" disabled selected>Priority</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+            <input type="date" name="deadline" required>
+            <select name="status" required>
+                <option value="" disabled selected>Status</option>
+                <option value="Not Started">Not Started</option>
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+            </select>
+            <input type="text" name="project" placeholder="Project Name" required>
+            <button type="submit">Add Task</button>
+        </form>
+    </div>
+
+    <div class="task-list">
+        <h2>Task List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Task Name</th>
+                    <th>Description</th>
+                    <th>Priority</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Project</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td>{{ task.task_name }}</td>
+                    <td>{{ task.description }}</td>
+                    <td>{{ task.priority }}</td>
+                    <td>{{ task.deadline }}</td>
+                    <td>{{ task.status }}</td>
+                    <td>{{ task.project }}</td>
+                    <td class="task-actions">
+                        <a href="{{ url_for('edit_task', task_id=task['_id']) }}">Edit</a> 
+                        <a href="{{ url_for('delete_task', task_id=task['_id']) }}" class="delete-btn">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
